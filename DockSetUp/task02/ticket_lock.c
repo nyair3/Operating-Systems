@@ -3,13 +3,7 @@
 #include <sched.h>
 #include "ticket_lock.h"
 
-int x = 0;  
-
-typedef struct
-{
-    atomic_int ticket;
-    atomic_int cur_ticket;
-} ticket_lock;
+int x = 0;
 
 //--------------------------------------------------------------------//
 
@@ -40,12 +34,14 @@ void ticketlock_release(ticket_lock *lock)
 
 //--------------------------------------------------------------------//
 
-/*void thread_func(void *arg)
+void thread_func(void *arg)
 {
     ticket_lock *lock = (ticket_lock *)arg;
     ticketlock_acquire(lock); // critical section
     x++;
-    printf("Thread %lu - %d\n", pthread_self(), x);
+    printf("Thread %p - %d\n", (void *)pthread_self(), x);
+
+    //printf("Thread %lu - %d\n", pthread_self(), x);
     ticketlock_release(lock);
-}*/
+}
 //----------------------------------End of File----------------------------------//

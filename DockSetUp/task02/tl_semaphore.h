@@ -1,6 +1,5 @@
 #ifndef TL_SEMAPHORE_H
 #define TL_SEMAPHORE_H
-
 #include "ticket_lock.h"
 #include <stdatomic.h>
 
