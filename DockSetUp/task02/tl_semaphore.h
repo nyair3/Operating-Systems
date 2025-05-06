@@ -1,6 +1,7 @@
 #ifndef TL_SEMAPHORE_H
 #define TL_SEMAPHORE_H
 
+#include "ticket_lock.h"
 #include <stdatomic.h>
 
 /*
@@ -9,7 +10,9 @@
  */
 typedef struct {
     // write your implementation here
-} semaphore semaphore;
+  int value;
+  ticket_lock lock;
+} semaphore;
 
 /*
  * Initializes the semaphore pointed to by 'sem' with the specified initial value.
@@ -27,3 +30,4 @@ void semaphore_wait(semaphore* sem);
 void semaphore_signal(semaphore* sem);
 
 #endif // TL_SEMAPHORE_H
+

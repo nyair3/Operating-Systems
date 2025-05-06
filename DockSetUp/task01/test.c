@@ -12,6 +12,7 @@ void test_func(void *arg)
     // Critical Section up to N threads
     printf("Thread in critical section\n");
     semaphore_signal(sem);
+    
 }
 
 int main()
