@@ -2,6 +2,7 @@
 #define TAS_SEMAPHORE_H
 
 #include <stdatomic.h>
+#include "spin_lock.h"
 
 /*
  * Define the semaphore type.

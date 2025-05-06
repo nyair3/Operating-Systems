@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <pthread.h>
+#include <sched.h>
 #include "spin_lock.h"
 
 //
@@ -9,7 +12,7 @@
 //
 //
 
-
+/*
 int main()
 {
 #define N 2
@@ -27,6 +30,7 @@ int main()
     }
     return 0;
 }
+    */
 
 //--------------------------------------------------------------------\\
 

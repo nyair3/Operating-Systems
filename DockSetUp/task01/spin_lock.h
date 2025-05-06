@@ -1,4 +1,5 @@
 #include <stdatomic.h>
+typedef atomic_flag spinlock;
 
 void spinlock_init(atomic_flag *lock);
 

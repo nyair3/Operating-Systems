@@ -1,5 +1,6 @@
 #include "tas_semaphore.h"
-#include "spin_lock.c"
+#include "spin_lock.h"
+#include <stdio.h>
 
 /*
  * TODO: Implement semaphore_init using a TAS spinlock.
@@ -50,4 +51,4 @@ void semaphore_signal(semaphore *sem)
     spinlock_release(&(sem->lock)); // unlocks
 }
 
-//----------------------------------End of File----------------------------------\\
+//----------------------------------End of File----------------------------------//
