@@ -3,9 +3,7 @@
 #include <sched.h>
 #include "ticket_lock.h"
 
-int x = 0;
-
-//--------------------------------------------------------------------//
+extern int x;
 
 void ticketlock_init(ticket_lock *lock)
 {

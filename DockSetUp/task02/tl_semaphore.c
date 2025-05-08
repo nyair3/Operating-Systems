@@ -10,7 +10,7 @@ void semaphore_init(semaphore* sem, int initial_value) {
     sem->value = initial_value;
     ticketlock_init(&(sem->lock));
 }
-
+//--------------------------------------------------------------------//
 /*
  * TODO: Implement semaphore_wait using the Ticket Lock mechanism.
  */
@@ -31,7 +31,7 @@ void semaphore_wait(semaphore* sem) {
         // Busy wait: try again
     }
 }
-
+//--------------------------------------------------------------------//
 /*
  * TODO: Implement semaphore_signal using the Ticket Lock mechanism.
  */
