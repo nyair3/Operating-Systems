@@ -7,7 +7,7 @@ void condition_variable_init(condition_variable *cv)
 {
     // TODO: Initialize internal fields.
     cv->waiters_count = 0;
-    ticket_lock_init(&cv->waiters_lock);
+    ticketlock_init(&cv->waiters_lock);
     semaphore_init(&cv->sem, 0); 
 }
 
@@ -17,15 +17,15 @@ void condition_variable_init(condition_variable *cv)
 void condition_variable_wait(condition_variable *cv, ticket_lock *ext_lock)
 {
     // TODO: Increase waiter count, release ext_lock, wait until signaled, then reacquire ext_lock.
-     ticket_lock_acquire(&cv->waiters_lock);
+     ticketlock_acquire(&cv->waiters_lock);
     cv->waiters_count++;
-    ticket_lock_release(&cv->waiters_lock);
+    ticketlock_release(&cv->waiters_lock);
     
-    ticket_lock_release(ext_lock);
+    ticketlock_release(ext_lock);
     
     semaphore_wait(&cv->sem);
     
-    ticket_lock_acquire(ext_lock);
+    ticketlock_acquire(ext_lock);
 }
 
 /*
@@ -34,13 +34,13 @@ void condition_variable_wait(condition_variable *cv, ticket_lock *ext_lock)
 void condition_variable_signal(condition_variable *cv)
 {
     // TODO: Signal one waiting thread.
-    ticket_lock_acquire(&cv->waiters_lock);
+    ticketlock_acquire(&cv->waiters_lock);
     if (cv->waiters_count > 0) {
         
         cv->waiters_count--;
         semaphore_signal(&cv->sem); 
     }
-    ticket_lock_release(&cv->waiters_lock);
+    ticketlock_release(&cv->waiters_lock);
 }
 
 /*
@@ -49,13 +49,13 @@ void condition_variable_signal(condition_variable *cv)
 void condition_variable_broadcast(condition_variable *cv)
 {
     // TODO: Signal all waiting threads.
-  ticket_lock_acquire(&cv->waiters_lock);
+  ticketlock_acquire(&cv->waiters_lock);
     // Wake up all waiting threads
     int waiters = cv->waiters_count;
     for (int i = 0; i < waiters; i++) {
         semaphore_signal(&cv->sem);
     }
     cv->waiters_count = 0;
-    ticket_lock_release(&cv->waiters_lock);
+    ticketlock_release(&cv->waiters_lock);
 }
-//----------------------------------//
+//----------------------------------End of File----------------------------------//gcc -o test03 ../task03/test03.c ../task03/cond_var.c ../task01/ticket_lock.c ../task01/tl_semaphore.c -lpthread

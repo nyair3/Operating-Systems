@@ -17,7 +17,7 @@ void *waiter_thread(void *arg)
     int id = *(int*)arg;
     
     // Acquire the lock
-    ticket_lock_acquire(&lock);
+    ticketlock_acquire(&lock);
     
     printf("Thread %d is waiting\n", id);
     threads_waiting++;
@@ -30,7 +30,7 @@ void *waiter_thread(void *arg)
     printf("Thread %d woke up, counter = %d\n", id, counter);
     
     // Release the lock
-    ticket_lock_release(&lock);
+    ticketlock_release(&lock);
     
     return NULL;
 }
@@ -61,7 +61,7 @@ void *signaler_thread(void *arg)
 int main(void)
 {
     // Initialize lock and condition variable
-    ticket_lock_init(&lock);
+    ticketlock_init(&lock);
     condition_variable_init(&cv);
     
     pthread_t waiters[THREADS];
