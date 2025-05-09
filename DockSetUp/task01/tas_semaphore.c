@@ -45,10 +45,8 @@ void semaphore_signal(semaphore *sem)
 {
     // TODO: Acquire the spinlock, increment the semaphore value, then release the spinlock.
     spinlock_acquire(&(sem->lock)); // lock first
-    printf("Has lock\n");
 
     sem->value++; // increment
-    printf("Inc\n");
 
     spinlock_release(&(sem->lock)); // unlocks
 }

@@ -2,6 +2,7 @@
 #define COND_VAR_H
 
 #include <stdatomic.h>
+#include "tl_semaphore.h"
 
 /*
  * Define the condition variable type.
@@ -9,15 +10,18 @@
  */
 typedef struct {
     // write your implementation here
-} condition_variable condition_variable;
 
+} condition_variable;
+//atomic_bool
 /*
  * Define the ticket lock type, which may be used as the external lock.
  * Write your struct details in this file.
  */
 typedef struct {
     // write your implementation here
-} ticket_lock ticket_lock;
+    atomic_int ticket ;
+    atomic_int cur_ticket ;
+} ticket_lock;
 
 /*
  * Initializes the condition variable pointed to by 'cv'.
@@ -41,3 +45,4 @@ void condition_variable_signal(condition_variable* cv);
 void condition_variable_broadcast(condition_variable* cv);
 
 #endif // COND_VAR_H
+
