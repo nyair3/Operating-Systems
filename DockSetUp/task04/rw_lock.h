@@ -9,6 +9,9 @@
  */
 typedef struct {
     // write your implementation here
+    atomic_int readers;        
+    atomic_int writer;         
+    atomic_int writer_waiting;
 } rwlock;
 
 /*
