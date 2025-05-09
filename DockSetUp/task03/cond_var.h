@@ -2,6 +2,7 @@
 #define COND_VAR_H
 
 #include <stdatomic.h>
+#include "ticket_lock.h"
 #include "tl_semaphore.h"
 
 /*
@@ -9,9 +10,11 @@
  * Write your struct details in this file.
  */
 typedef struct {
-    // write your implementation here
-
+    int waiters_count;         
+    ticket_lock waiters_lock;  
+    semaphore sem;           
 } condition_variable;
+
 //atomic_bool
 /*
  * Define the ticket lock type, which may be used as the external lock.
@@ -19,9 +22,9 @@ typedef struct {
  */
 typedef struct {
     // write your implementation here
-    atomic_int ticket ;
-    atomic_int cur_ticket ;
-} ticket_lock;
+    atomic_int ticket;
+    atomic_int cur_ticket;
+} waiters_lock;
 
 /*
  * Initializes the condition variable pointed to by 'cv'.
