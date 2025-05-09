@@ -3,8 +3,6 @@
 #include <sched.h>
 #include "ticket_lock.h"
 
-extern int x;
-
 void ticketlock_init(ticket_lock *lock)
 {
     atomic_init(&lock->ticket, 0);
@@ -30,16 +28,4 @@ void ticketlock_release(ticket_lock *lock)
     atomic_fetch_add(&lock->cur_ticket, 1);
 }
 
-//--------------------------------------------------------------------//
-
-void thread_func(void *arg)
-{
-    ticket_lock *lock = (ticket_lock *)arg;
-    ticketlock_acquire(lock); // critical section
-    x++;
-    printf("Thread %p - %d\n", (void *)pthread_self(), x);
-
-    //printf("Thread %lu - %d\n", pthread_self(), x);
-    ticketlock_release(lock);
-}
 //----------------------------------End of File----------------------------------//

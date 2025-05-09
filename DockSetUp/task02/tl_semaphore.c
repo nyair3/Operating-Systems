@@ -38,10 +38,8 @@ void semaphore_wait(semaphore* sem) {
 void semaphore_signal(semaphore* sem) {
     // TODO: Increment the semaphore value and allow the next ticket holder to proceed.
       ticketlock_acquire(&(sem->lock)); // lock first
-      printf("Has lock\n");
   
       sem->value++; // increment
-      printf("Inc\n");
   
       ticketlock_release(&(sem->lock)); // unlocks
 }
