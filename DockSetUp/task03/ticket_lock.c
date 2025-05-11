@@ -8,9 +8,7 @@ void ticketlock_init(ticket_lock *lock)
     atomic_init(&lock->ticket, 0);
     atomic_init(&lock->cur_ticket, 0);
 }
-
 //--------------------------------------------------------------------//
-
 void ticketlock_acquire(ticket_lock *lock)
 {
     // get my ticket
@@ -20,12 +18,9 @@ void ticketlock_acquire(ticket_lock *lock)
         sched_yield();
     }
 }
-
 //--------------------------------------------------------------------//
-
 void ticketlock_release(ticket_lock *lock)
 {
     atomic_fetch_add(&lock->cur_ticket, 1);
 }
-
 //----------------------------------End of File----------------------------------//

@@ -9,7 +9,7 @@ void rwlock_init(rwlock* lock) {
     atomic_init(&lock->writer, 0);
     atomic_init(&lock->writer_waiting, 0);
 }
-
+//--------------------------------------------------------------------//
 /*
  * TODO: Implement rwlock_acquire_read.
  */
@@ -41,7 +41,7 @@ void rwlock_acquire_read(rwlock* lock) {
         }
     */
 }
-
+//--------------------------------------------------------------------//
 /*
  * TODO: Implement rwlock_release_read.
  */
@@ -49,7 +49,7 @@ void rwlock_release_read(rwlock* lock) {
     // TODO: Decrement the reader count.
     atomic_fetch_sub(&lock->readers, 1);
 }
-
+//--------------------------------------------------------------------//
 /*
  * TODO: Implement rwlock_acquire_write.
  */
@@ -73,8 +73,7 @@ void rwlock_acquire_write(rwlock* lock) {
     // No longer waiting (we're now active)
     atomic_fetch_sub(&lock->writer_waiting, 1);
 }
-
-
+//--------------------------------------------------------------------//
 /*
  * TODO: Implement rwlock_release_write.
  */
@@ -83,3 +82,4 @@ void rwlock_release_write(rwlock* lock) {
         atomic_store(&lock->writer, 0);
 
 }
+//----------------------------------End of File----------------------------------//
