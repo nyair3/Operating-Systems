@@ -8,7 +8,6 @@
  * Write your struct details in this file..
  */
 typedef struct {
-    // write your implementation here
   int value;
   ticket_lock lock;
 } semaphore;
@@ -28,7 +27,6 @@ void semaphore_wait(semaphore* sem);
  */
 void semaphore_signal(semaphore* sem);
 
-#endif // TL_SEMAPHORE_H
-
+#endif 
 //----------------------------------End of File----------------------------------//
 

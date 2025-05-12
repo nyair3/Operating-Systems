@@ -5,17 +5,16 @@
 
 void spinlock_init(atomic_flag *lock)
 {
-    atomic_flag_clear(lock);
+    atomic_flag_clear(lock); //initialize the spin lock
 }
 
 //--------------------------------------------------------------------//
 
 void spinlock_acquire(atomic_flag *lock)
 {
-    while (atomic_flag_test_and_set(lock))
+    while (atomic_flag_test_and_set(lock)) //when we have the lock
     {
-        // scheduler – yield (i.e. skip)
-        sched_yield();
+        sched_yield(); //thread goes into ready state
     }
 }
 
@@ -23,6 +22,6 @@ void spinlock_acquire(atomic_flag *lock)
 
 void spinlock_release(atomic_flag *lock)
 {
-    atomic_flag_clear(lock);
+    atomic_flag_clear(lock); //releases the lock
 } 
 //----------------------------------End of File-----------------------//

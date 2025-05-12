@@ -6,7 +6,7 @@ typedef struct
 {
  atomic_int ticket ;
  atomic_int cur_ticket ;
-} ticket_lock ;
+} ticket_lock;
 
 //--------------------------------------------------------------------//
 void ticketlock_init(ticket_lock *lock);

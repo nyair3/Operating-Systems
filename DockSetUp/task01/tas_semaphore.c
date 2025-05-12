@@ -19,12 +19,11 @@ void semaphore_init(semaphore *sem, int initial_value)
  */
 void semaphore_wait(semaphore *sem)
 {
-    // TODO: Acquire the spinlock, decrement the semaphore value, then release the spinlock.
     while (1)
     {
         spinlock_acquire(&(sem->lock)); // lock first
 
-        if (sem->value > 0)
+        if (sem->value > 0) 
         {
             sem->value--;                   // decrement
             spinlock_release(&(sem->lock)); // unlock
@@ -38,12 +37,8 @@ void semaphore_wait(semaphore *sem)
 
 //--------------------------------------------------------------------//
 
-/*
- * TODO: Implement semaphore_signal using the TAS spinlock mechanism.
- */
 void semaphore_signal(semaphore *sem)
 {
-    // TODO: Acquire the spinlock, increment the semaphore value, then release the spinlock.
     spinlock_acquire(&(sem->lock)); // lock first
 
     sem->value++; // increment
