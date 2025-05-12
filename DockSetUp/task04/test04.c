@@ -1,139 +1,256 @@
 #include <stdio.h>
 #include <pthread.h>
-#include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
+#include <stdlib.h>
 #include "rw_lock.h"
 
-#define NUM_READERS 5
-#define NUM_WRITERS 3
-#define READS_PER_READER 100
-#define WRITES_PER_WRITER 50
-
-// Shared data protected by the lock
-int shared_counter = 0;
+// Shared variables
+int shared_data = 0;
+int writer_accessed_during_read = 0;
 rwlock lock;
 
-// Flag to detect inconsistencies
-int inconsistency_detected = 0;
+// Time tracking
+time_t reader_start_time = 0;
+time_t reader_end_time = 0;
+time_t writer_start_time = 0;
+time_t writer_end_time = 0;
 
-void *reader_thread(void *arg)
-{
-    int thread_id = *(int *)arg;
-    int local_reads = 0;
+// Helper function to calculate average duration
+double calculate_avg_duration(time_t start_times[], time_t end_times[], int count) {
+    double total = 0;
+    for (int i = 0; i < count; i++) {
+        total += (double)(end_times[i] - start_times[i]);
+    }
+    return total / count;
+}
 
-    for (int i = 0; i < READS_PER_READER; i++)
-    {
-        rwlock_acquire_read(&lock);
+/******** TEST 1: One reader, one writer ********/
 
-        // Read operation (just reading the current value)
-        int value = shared_counter;
-
-        // Simulate some work
-        usleep(rand() % 1000);
-
-        // Verify the value didn't change during our read
-        if (value != shared_counter)
-        {
-            printf("Reader %d detected inconsistency! %d != %d\n",
-                   thread_id, value, shared_counter);
-            inconsistency_detected = 1;
+void* test1_reader(void* arg) {
+    printf("Reader starting\n");
+    reader_start_time = time(NULL);
+    
+    // Acquire read lock
+    rwlock_acquire_read(&lock);
+    
+    printf("Reader acquired lock, will hold for 15 seconds\n");
+    
+    // Hold the read lock for 15 seconds
+    for (int i = 0; i < 15; i++) {
+        printf("Reader reading data: %d (second %d)\n", shared_data, i+1);
+        
+        // Check if writer modified data while we're reading
+        if (shared_data != 0) {
+            writer_accessed_during_read = 1;
+            printf("ERROR: Writer modified data during read!\n");
         }
-
-        rwlock_release_read(&lock);
-        local_reads++;
-
-        // Small delay between operations
-        usleep(rand() % 500);
+        
+        sleep(1);
     }
-
-    printf("Reader %d completed %d reads\n", thread_id, local_reads);
+    
+    rwlock_release_read(&lock);
+    reader_end_time = time(NULL);
+    printf("Reader finished after %ld seconds\n", reader_end_time - reader_start_time);
+    
     return NULL;
 }
-//--------------------------------------------------------------------//
-void *writer_thread(void *arg)
-{
-    int thread_id = *(int *)arg;
-    int local_writes = 0;
 
-    for (int i = 0; i < WRITES_PER_WRITER; i++)
-    {
-        rwlock_acquire_write(&lock);
-
-        // Write operation (incrementing the counter)
-        shared_counter++;
-
-        // Simulate some work
-        usleep(rand() % 2000);
-
-        rwlock_release_write(&lock);
-        local_writes++;
-
-        // Small delay between operations
-        usleep(rand() % 1000);
-    }
-
-    printf("Writer %d completed %d writes\n", thread_id, local_writes);
+void* test1_writer(void* arg) {
+    printf("Writer starting\n");
+    writer_start_time = time(NULL);
+    
+    // Try to acquire write lock
+    printf("Writer attempting to acquire lock\n");
+    rwlock_acquire_write(&lock);
+    
+    writer_start_time = time(NULL);
+    printf("Writer acquired lock after %ld seconds\n", 
+           writer_start_time - (reader_start_time + 5));
+    
+    // Modify the shared data
+    shared_data = 100;
+    printf("Writer modified data to: %d\n", shared_data);
+    
+    // Hold the lock for 3 seconds
+    sleep(3);
+    
+    rwlock_release_write(&lock);
+    writer_end_time = time(NULL);
+    printf("Writer released lock\n");
+    
     return NULL;
 }
-//--------------------------------------------------------------------//
-int main()
-{
-    // Initialize random number generator
-    srand(time(NULL));
 
-    // Initialize the read-write lock
+void run_test1() {
+    printf("\n===== TEST 1: One reader, one writer =====\n");
+    
+    // Initialize
     rwlock_init(&lock);
-
-    // Create thread IDs and threads
-    pthread_t reader_threads[NUM_READERS];
-    pthread_t writer_threads[NUM_WRITERS];
-    int reader_ids[NUM_READERS];
-    int writer_ids[NUM_WRITERS];
-
-    // Start reader threads
-    for (int i = 0; i < NUM_READERS; i++)
-    {
-        reader_ids[i] = i;
-        pthread_create(&reader_threads[i], NULL, reader_thread, &reader_ids[i]);
-    }
-
-    // Start writer threads
-    for (int i = 0; i < NUM_WRITERS; i++)
-    {
-        writer_ids[i] = i;
-        pthread_create(&writer_threads[i], NULL, writer_thread, &writer_ids[i]);
-    }
-
-    // Wait for all threads to complete
-    for (int i = 0; i < NUM_READERS; i++)
-    {
-        pthread_join(reader_threads[i], NULL);
-    }
-
-    for (int i = 0; i < NUM_WRITERS; i++)
-    {
-        pthread_join(writer_threads[i], NULL);
-    }
-
+    shared_data = 0;
+    writer_accessed_during_read = 0;
+    
+    pthread_t reader, writer;
+    
+    // Start reader
+    pthread_create(&reader, NULL, test1_reader, NULL);
+    
+    // Wait 5 seconds, then start writer
+    sleep(5);
+    pthread_create(&writer, NULL, test1_writer, NULL);
+    
+    // Wait for threads to finish
+    pthread_join(reader, NULL);
+    pthread_join(writer, NULL);
+    
     // Check results
-    int expected_final_count = NUM_WRITERS * WRITES_PER_WRITER;
-    printf("\n--- Test Results ---\n");
-    printf("Final counter value: %d\n", shared_counter);
-    printf("Expected counter value: %d\n", expected_final_count);
-
-    if (shared_counter != expected_final_count)
-    {
-        printf("TEST FAILED: Counter values don't match!\n");
-        return 1;
+    printf("\nTest 1 Results:\n");
+    if (writer_accessed_during_read) {
+        printf("TEST FAILED: Writer accessed resource while reader was active\n");
+    } else if (writer_start_time < reader_end_time) {
+        printf("TEST FAILED: Writer acquired lock before reader finished\n");
+    } else {
+        printf("TEST PASSED: No context switch occurred before reader finished\n");
     }
+    
+    printf("Reader duration: %ld seconds\n", reader_end_time - reader_start_time);
+    printf("Writer waited approximately: %ld seconds\n", 
+           writer_start_time - (reader_start_time + 5));
+}
 
-    if (inconsistency_detected)
-    {
-        printf("TEST FAILED: Readers detected inconsistencies!\n");
-        return 1;
+/******** TEST 2: Multiple readers, one writer ********/
+
+#define NUM_READERS 15
+
+// Tracking for multiple readers
+time_t readers_start_times[NUM_READERS];
+time_t readers_end_times[NUM_READERS];
+int readers_active = 0;
+
+void* test2_reader(void* arg) {
+    int id = *(int*)arg;
+    printf("Reader %d starting\n", id);
+    readers_start_times[id] = time(NULL);
+    
+    // Acquire read lock
+    rwlock_acquire_read(&lock);
+    
+    __sync_fetch_and_add(&readers_active, 1);
+    printf("Reader %d acquired lock, will hold for 15 seconds\n", id);
+    
+    // Hold the read lock for 15 seconds
+    for (int i = 0; i < 15; i++) {
+        printf("Reader %d reading data: %d (second %d)\n", id, shared_data, i+1);
+        
+        // Check if writer modified data while we're reading
+        if (shared_data != 0) {
+            writer_accessed_during_read = 1;
+            printf("ERROR: Writer modified data during read! (detected by reader %d)\n", id);
+        }
+        
+        sleep(1);
     }
+    
+    rwlock_release_read(&lock);
+    __sync_fetch_and_sub(&readers_active, 1);
+    readers_end_times[id] = time(NULL);
+    printf("Reader %d finished after %ld seconds\n", id, readers_end_times[id] - readers_start_times[id]);
+    
+    return NULL;
+}
 
-    printf("TEST PASSED: Read-write lock implementation works correctly!\n");
+void* test2_writer(void* arg) {
+    printf("Writer starting\n");
+    writer_start_time = time(NULL);
+    
+    // Try to acquire write lock
+    printf("Writer attempting to acquire lock\n");
+    rwlock_acquire_write(&lock);
+    
+    writer_start_time = time(NULL);
+    printf("Writer acquired lock after %ld seconds\n", 
+           writer_start_time - (readers_start_times[0] + 5));
+    
+    // Check if any readers are still active
+    if (readers_active > 0) {
+        printf("ERROR: Writer acquired lock while %d readers are still active!\n", readers_active);
+    }
+    
+    // Modify the shared data
+    shared_data = 100;
+    printf("Writer modified data to: %d\n", shared_data);
+    
+    // Hold the lock for 3 seconds
+    sleep(3);
+    
+    rwlock_release_write(&lock);
+    writer_end_time = time(NULL);
+    printf("Writer released lock\n");
+    
+    return NULL;
+}
+
+void run_test2() {
+    printf("\n===== TEST 2: %d readers, one writer =====\n", NUM_READERS);
+    
+    // Initialize
+    rwlock_init(&lock);
+    shared_data = 0;
+    writer_accessed_during_read = 0;
+    readers_active = 0;
+    
+    pthread_t readers[NUM_READERS], writer;
+    int reader_ids[NUM_READERS];
+    
+    // Start readers
+    for (int i = 0; i < NUM_READERS; i++) {
+        reader_ids[i] = i;
+        pthread_create(&readers[i], NULL, test2_reader, &reader_ids[i]);
+        usleep(50000); // Small delay between reader starts
+    }
+    
+    // Wait 5 seconds, then start writer
+    sleep(5);
+    pthread_create(&writer, NULL, test2_writer, NULL);
+    
+    // Wait for threads to finish
+    for (int i = 0; i < NUM_READERS; i++) {
+        pthread_join(readers[i], NULL);
+    }
+    pthread_join(writer, NULL);
+    
+    // Calculate earliest reader end time
+    time_t earliest_reader_end = readers_end_times[0];
+    for (int i = 1; i < NUM_READERS; i++) {
+        if (readers_end_times[i] < earliest_reader_end) {
+            earliest_reader_end = readers_end_times[i];
+        }
+    }
+    
+    // Check results
+    printf("\nTest 2 Results:\n");
+    if (writer_accessed_during_read) {
+        printf("TEST FAILED: Writer accessed resource while readers were active\n");
+    } else if (writer_start_time < earliest_reader_end) {
+        printf("TEST FAILED: Writer acquired lock before all readers finished\n");
+    } else {
+        printf("TEST PASSED: No context switch occurred before readers finished\n");
+    }
+    
+    printf("Average reader duration: %.2f seconds\n", calculate_avg_duration(readers_start_times, readers_end_times, NUM_READERS));
+    printf("Writer waited approximately: %ld seconds\n", 
+           writer_start_time - (readers_start_times[0] + 5));
+}
+
+int main() {
+    // Run Test 1
+    run_test1();
+    
+    // Add a delay between tests
+    sleep(2);
+    
+    // Run Test 2
+    run_test2();
+    
     return 0;
 }
-//----------------------------------End of File----------------------------------//

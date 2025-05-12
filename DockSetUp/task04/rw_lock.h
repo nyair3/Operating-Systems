@@ -2,16 +2,16 @@
 #define RW_LOCK_H
 
 #include <stdatomic.h>
+#include "tl_semaphore.h"
 
 /*
  * Define the read-write lock type.
  * Write your struct details in this file..
  */
 typedef struct {
-    // write your implementation here
-    atomic_int readers;        
-    atomic_int writer;         
-    atomic_int writer_waiting;
+    semaphore mutex; //bounded semaphore initialized to 1
+    semaphore write_lock;
+    int num_readers;
 } rwlock;
 //--------------------------------------------------------------------//
 /*
