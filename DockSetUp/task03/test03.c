@@ -17,8 +17,8 @@ void *waiter_thread(void *arg)
     ticketlock_acquire(&lock);
     threads_waiting++;
     condition_variable_wait(&cv, &lock); // wait on condition var
-    counter++; // thread woke up, increment counter
-    ticketlock_release(&lock); // release lock
+    counter++;                           // thread woke up, increment counter
+    ticketlock_release(&lock);           // release lock
 
     return NULL;
 }
@@ -33,8 +33,8 @@ void *signaler_thread(void *arg)
         usleep(50000); // sleep --> 50ms
     }
 
-    usleep(100000); // sleep --> 100ms
-    condition_variable_broadcast(&cv); //wake up rest of waiting threads
+    usleep(100000);                    // sleep --> 100ms
+    condition_variable_broadcast(&cv); // wake up rest of waiting threads
 
     return NULL;
 }
@@ -56,8 +56,8 @@ int main(void)
     }
 
     pthread_create(&signaler, NULL, signaler_thread, NULL); // make threads to signal
-    pthread_join(signaler, NULL); // waits for signaler to terminate
-    
+    pthread_join(signaler, NULL);                           // waits for signaler to terminate
+
     for (int i = 0; i < THREADS; i++)
     {
         pthread_join(waiters[i], NULL); // waits for waiter threads to terminate
@@ -72,7 +72,6 @@ int main(void)
     {
         printf("All %d threads woke up :)\n", THREADS);
     }
-
 
     return 0;
 }
