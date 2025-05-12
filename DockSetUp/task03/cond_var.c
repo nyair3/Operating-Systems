@@ -2,37 +2,28 @@
 
 void condition_variable_init(condition_variable *cv)
 {
-    // TODO: Initialize internal fields.
-    cv->waiters_count = 0;
+    cv->waiters_count = 0; //initialize num waiting threads to 0
     ticketlock_init(&cv->waiters_lock);
     semaphore_init(&cv->sem, 0); 
 }
 //--------------------------------------------------------------------//
 void condition_variable_wait(condition_variable *cv, ticket_lock *ext_lock)
 {
-    // TODO: Increase waiter count, release ext_lock, wait until signaled, then reacquire ext_lock.
-     ticketlock_acquire(&cv->waiters_lock);
-    cv->waiters_count++;
-    ticketlock_release(&cv->waiters_lock);
-    
-    ticketlock_release(ext_lock);
-    
-    semaphore_wait(&cv->sem);
-    
-    ticketlock_acquire(ext_lock);
+    ticketlock_acquire(&cv->waiters_lock); //lock waiters lock
+    cv->waiters_count++; //inc. num threads waiting
+    ticketlock_release(&cv->waiters_lock); //release waiters lock
+    ticketlock_release(ext_lock); //release external lock
+    semaphore_wait(&cv->sem); //wait on semaphore
+    ticketlock_acquire(ext_lock); //when signaled, release ext lock
+
 }
 
-/*
- * TODO: Implement condition_variable_signal.
- */
 void condition_variable_signal(condition_variable *cv)
 {
-    // TODO: Signal one waiting thread.
-    ticketlock_acquire(&cv->waiters_lock);
-    if (cv->waiters_count > 0) {
-        
-        cv->waiters_count--;
-        semaphore_signal(&cv->sem); 
+    ticketlock_acquire(&cv->waiters_lock); //get waiters lock  
+    if (cv->waiters_count > 0) { //if we have threads waiting
+        cv->waiters_count--; //Decrement count of waiting threads.
+        semaphore_signal(&cv->sem); //wake up thread waiting on semaphore
     }
     ticketlock_release(&cv->waiters_lock); //if no threads waiting release lock
 }
