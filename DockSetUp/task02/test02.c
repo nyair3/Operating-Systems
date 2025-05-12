@@ -30,6 +30,7 @@ void *thread_function(void *arg)
 
 int main(void)
 {
+    //initialize 2 semaphores
     semaphore sem1, sem2;
     semaphore_init(&sem1, 1);
     semaphore_init(&sem2, 1);
@@ -37,7 +38,7 @@ int main(void)
     pthread_t threads[THREADS];
     struct args args[THREADS];
 
-    for(int i = 0; i < THREADS; i++)
+    for(int i = 0; i < THREADS; i++) //create threads
     {
         args[i].sem1 = &sem1;
         args[i].sem2 = &sem2;
@@ -46,13 +47,13 @@ int main(void)
 
     for(int i = 0; i < THREADS; i++)
     {
-        pthread_join(threads[i], NULL);
+        pthread_join(threads[i], NULL); //waits for threads at i to terminate
     }
 
-    if(x != THREADS)
+    if(x != THREADS) //if x isnt equal to the set number of threads we failed
     {
         printf("Value is %d, expected %d\n", x, THREADS);
-        fprintf(stderr, "Failed!");
+        fprintf(stderr, "Failed!"); //error
     }
     printf("Num threads is: %d\n", x);
     return 0;
