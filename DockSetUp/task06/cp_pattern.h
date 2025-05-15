@@ -1,5 +1,6 @@
 #ifndef CP_PATTERN_H
 #define CP_PATTERN_H
+#include "cond_var.h"
 
 /*
  * Starts the consumers and producers, and passes the seed to the producers.

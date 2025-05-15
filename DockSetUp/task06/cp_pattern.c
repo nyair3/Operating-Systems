@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+condition_variable cv;
+condition_variable_init(&cv);
+
 /*
  * TODO: Implement start_consumers_producers.
  * This function should:
@@ -11,6 +14,13 @@
  */
 void start_consumers_producers(int consumers, int producers, int seed) {
     // TODO: Print configuration and start threads.
+    pthread_t prods[producers];
+    pthread_t cons[consumers];
+    strand(1000000); //initializes randomizer
+    for(int i = 0; i<1000000; i++){
+        producers = rand() % 1000001;
+    }
+    
 }
 
 /*
@@ -51,5 +61,14 @@ int main(int argc, char* argv[]) {
     // TODO: Parse arguments.
     // TODO: Start producer-consumer process.
     // TODO: Wait for threads to finish and clean up resources.
+    start_consumers_producers(); //start consumers producers
+    wait_until_producers_produced_all_numbers();
+    wait_consumers_queue_empty();
+    stop_consumers();
     return 0;
+}
+
+bool cons_is_empty()
+{
+    return false;
 }

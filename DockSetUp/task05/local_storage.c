@@ -24,25 +24,17 @@ void init_storage(void)
 void tls_thread_alloc(void)
 {
     // TODO: Use your synchronization mechanism to safely allocate an entry.
-    int64_t current_id = (int64_t)pthread_self();
-    int index = -1;
+    //int64_t current_id = (int64_t)pthread_self();
+    
+    ///TSVI Comments
+    //check if the thread exists and is the current thread
 
-    for (int i = 0; i< MAX_THREADS; i++)
-    {
-        if (g_tls[i].thread_id == -1)
-        {
-            g_tls[i].thread_id = current_id;
-        }
-        else
-        {
-            return;
-        }
-    }
-    if (index == -1)
-    {
-        printf("thread [%ld] failed to initialize, not enough space\n", g_tls[i].thread_id);
-        exit(1);
-    }
+        //-1 says its free/empty to use
+        //find an empty/free thread and assign it to me
+
+    //if full print
+
+
 }
 
 /*
