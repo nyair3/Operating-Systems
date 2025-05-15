@@ -22,7 +22,7 @@ void *waiter_thread(void *arg)
 
     return NULL;
 }
-
+//--------------------------------------------------------------------//
 void *signaler_thread(void *arg)
 {
     usleep(100000); // sleep --> 100ms
