@@ -26,7 +26,7 @@ void tls_thread_alloc(void)
 {
     // TODO: Use your synchronization mechanism to safely allocate an entry.
     int64_t current_id = (int64_t)pthread_self(); // current id
-    int open_position = -1 // tracks empty slots
+    int open_position = -1; // tracks empty slots
 
     for (int i = 0; i < MAX_THREADS; i++)
     {
@@ -52,6 +52,7 @@ void tls_thread_alloc(void)
     if (open_position == -1)
     {
         printf("thread [%ld] failed to initialize, not enough space\n", current_id);
+        exit(1)
     }
     else
     {
