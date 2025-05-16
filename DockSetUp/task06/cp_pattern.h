@@ -1,9 +1,49 @@
 #ifndef CP_PATTERN_H
 #define CP_PATTERN_H
 #include "cond_var.h"
+#include "tl_semaphore.h"
+#include "ticket_lock.h"
+
+#define MAX_NUM 1000001
 
 /*
  * Starts the consumers and producers, and passes the seed to the producers.
+ */
+
+ typedef struct {
+    int queue[MAX_NUM];
+    int queue_size;
+    bool produced[MAX_NUM];
+    int total_produced;
+    bool producers_done;
+    bool consumers_done;
+
+    semaphore queue_items;
+    ticket_lock lock; 
+    condition_variable cv;
+} SharedData;
+
+extern SharedData shared;
+
+//--------------------------------------------------------------------//
+/*
+ * Creates producer threads
+ */
+void* producer(void* arg);
+//--------------------------------------------------------------------//
+/*
+ * Creates consumers threads
+ */
+void* consumer(void* arg);
+//--------------------------------------------------------------------//
+/*
+ * Checks if consumers is empty
+ */
+bool consumers_is_empty();
+
+//--------------------------------------------------------------------//
+/*
+ * Allocate consumer and producer threads
  */
 void start_consumers_producers(int consumers, int producers, int seed);
 //--------------------------------------------------------------------//
