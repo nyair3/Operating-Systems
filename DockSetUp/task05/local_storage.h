@@ -11,9 +11,10 @@
 /*
  * Structure to hold thread-specific arbitrary data.
  */
-typedef struct {
-    int64_t thread_id;  // For an unused entry, initialize to -1
-    void* data;         // Initialize to NULL
+typedef struct
+{
+    int64_t thread_id; // For an unused entry, initialize to -1
+    void *data;        // Initialize to NULL
 } tls_data_t;
 //--------------------------------------------------------------------//
 /*
@@ -35,12 +36,12 @@ void tls_thread_alloc(void);
 /*
  * Returns a pointer to the arbitrary data stored for the calling thread.
  */
-void* get_tls_data(void);
+void *get_tls_data(void);
 //--------------------------------------------------------------------//
 /*
  * Sets the given void* data to the TLS for the calling thread.
  */
-void set_tls_data(void* data);
+void set_tls_data(void *data);
 //--------------------------------------------------------------------//
 /*
  * Frees the TLS entry for the calling thread.
@@ -49,7 +50,7 @@ void tls_thread_free(void);
 //--------------------------------------------------------------------//
 /*
  * searches the array and returns true if the current thread is found
- 
+
 bool search(int target)
 */
 

@@ -7,11 +7,9 @@
 #include <stdlib.h>
 #define THREADS 100
 
-
-
 void *thread_function(void *arg)
 {
-    condition_variable *cv = (condition_variable*)arg;
+    condition_variable *cv = (condition_variable *)arg;
     ticket_lock tl;
     ticketlock_init(&tl);
     ticketlock_acquire(&tl);
@@ -20,10 +18,11 @@ void *thread_function(void *arg)
     sched_yield();
     tls_thread_alloc();
     sched_yield();
-    set_tls_data((void*)pthread_self());
+    set_tls_data((void *)pthread_self());
 
     sched_yield();
-    if ((pthread_t)get_tls_data() != pthread_self()) {
+    if ((pthread_t)get_tls_data() != pthread_self())
+    {
         printf("Shouldn't happen, failure");
         exit(1);
     }
@@ -46,7 +45,7 @@ int main(void)
 
     printf("Preparing all threads\n");
 
-    for(int i = 0; i < THREADS; i++)
+    for (int i = 0; i < THREADS; i++)
     {
         pthread_create(&threads[i], NULL, thread_function, &cond);
     }
@@ -59,7 +58,7 @@ int main(void)
 
     condition_variable_broadcast(&cond);
 
-    for(int i = 0; i < THREADS; i++)
+    for (int i = 0; i < THREADS; i++)
     {
         pthread_join(threads[i], NULL);
     }
@@ -69,9 +68,9 @@ int main(void)
 }
 //----------------------------------End of File----------------------------------//
 /// TSVI Comments
-    // check if the thread exists and is the current thread
+// check if the thread exists and is the current thread
 
-    //-1 says its free/empty to use
-    // find an empty/free thread and assign it to me
+//-1 says its free/empty to use
+// find an empty/free thread and assign it to me
 
-    // if full print
+// if full print

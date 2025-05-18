@@ -28,7 +28,7 @@ void tls_thread_alloc(void)
 {
     // TODO: Use your synchronization mechanism to safely allocate an entry.
     int64_t current_id = (int64_t)pthread_self();
-    int open_position = -1;                       
+    int open_position = -1;
 
     for (int i = 0; i < MAX_THREADS; i++)
     {
