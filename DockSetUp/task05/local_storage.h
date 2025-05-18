@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 #include <pthread.h>
+#include <stdbool.h>
+#include <stdio.h>
 
 #define MAX_THREADS 100
 
@@ -47,9 +49,9 @@ void tls_thread_free(void);
 //--------------------------------------------------------------------//
 /*
  * searches the array and returns true if the current thread is found
- */
+ 
 bool search(int target)
-
+*/
 
 #endif // LOCAL_STORAGE_H
 //----------------------------------End of File----------------------------------//

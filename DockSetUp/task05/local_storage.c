@@ -1,6 +1,8 @@
 #include "local_storage.h"
+#include <stdint.h>
+#include <pthread.h>
 #include <stdio.h>
-#include <stdbool.h>
+#include <stdlib.h>
 /*
  * TODO: Define the global TLS array.
  */
@@ -25,13 +27,13 @@ void init_storage(void)
 void tls_thread_alloc(void)
 {
     // TODO: Use your synchronization mechanism to safely allocate an entry.
-    int64_t current_id = (int64_t)pthread_self(); // current id
-    int open_position = -1; // tracks empty slots
+    int64_t current_id = (int64_t)pthread_self();
+    int open_position = -1;                       
 
     for (int i = 0; i < MAX_THREADS; i++)
     {
         // checks if the thread exists and is the current thread
-        if (search(g_tls[i].thread_id) || g_tls[i].thread_id == current_id)
+        if (g_tls[i].thread_id == current_id)
         {
             // Thread already initialized
             printf("Already initialized");
@@ -48,24 +50,17 @@ void tls_thread_alloc(void)
         }
     }
 
-    //checks if an empty postion was found
+    // checks if an empty postion can be found
     if (open_position == -1)
     {
         printf("thread [%ld] failed to initialize, not enough space\n", current_id);
-        exit(1)
+        exit(1);
     }
     else
     {
-        // allocates the thread id at the first open position
+        // allocates the thread id at the first empty/available position
         g_tls[open_position].thread_id = current_id;
     }
-    /// TSVI Comments
-    // check if the thread exists and is the current thread
-
-    //-1 says its free/empty to use
-    // find an empty/free thread and assign it to me
-
-    // if full print
 }
 //--------------------------------------------------------------------//
 /*
@@ -74,6 +69,20 @@ void tls_thread_alloc(void)
 void *get_tls_data(void)
 {
     // TODO: Search for the calling thread's entry and return its data.
+    int64_t current_id = (int64_t)pthread_self();
+
+    // Finds the entry for the cuerrnt thread thread
+    for (int i = 0; i < MAX_THREADS; i++)
+    {
+        if (g_tls[i].thread_id == current_id)
+        {
+            return g_tls[i].data;
+        }
+    }
+
+    // Prints if the entry for this thread is not found
+    printf("thread [%ld] has not been initialized in TLS\n", current_id);
+    exit(2);
     return NULL;
 }
 //--------------------------------------------------------------------//
@@ -83,6 +92,21 @@ void *get_tls_data(void)
 void set_tls_data(void *data)
 {
     // TODO: Search for the calling thread's entry and set its data.
+    int64_t current_id = (int64_t)pthread_self();
+
+    // Finds the entry for the cuerrnt thread and updates the TLS data for the calling thread
+    for (int i = 0; i < MAX_THREADS; i++)
+    {
+        if (g_tls[i].thread_id == current_id)
+        {
+            g_tls[i].data = data;
+            return;
+        }
+    }
+
+    // Prints if the entry for this thread is not found
+    printf("thread [%ld] has not been initialized in TLS\n", current_id);
+    exit(2);
 }
 //--------------------------------------------------------------------//
 /*
@@ -91,20 +115,21 @@ void set_tls_data(void *data)
 void tls_thread_free(void)
 {
     // TODO: Reset the thread_id and data in the corresponding TLS entry.
-}
-//--------------------------------------------------------------------//
-/*
- * searches the array and returns true if the current thread is found
- */
-bool search(int target)
-{
+    int64_t current_id = (int64_t)pthread_self();
+
     for (int i = 0; i < MAX_THREADS; i++)
     {
-        if (g_tls[i].thread_id == target)
+        if (g_tls[i].thread_id == current_id)
         {
-            return true;
+            // Resets the thread_id and data in the corresponding TLS entry
+            g_tls[i].thread_id = -1;
+            g_tls[i].data = NULL;
+            return;
         }
     }
-    return false;
+
+    // Prints if the entry for this thread is not found
+    printf("thread [%ld] has not been initialized in TLS\n", current_id);
+    exit(2);
 }
 //----------------------------------End of File----------------------------------//
