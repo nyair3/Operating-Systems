@@ -4,7 +4,7 @@
 #include "tl_semaphore.h"
 #include "ticket_lock.h"
 
-#define MAX_NUM 1000001
+#define MAX_NUM 1000000
 
 /*
  * Starts the consumers and producers, and passes the seed to the producers.
