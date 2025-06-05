@@ -7,7 +7,7 @@ void semaphore_init(semaphore *sem, int initial_value)
     sem->value = initial_value;
     ticketlock_init(&(sem->lock));
 }
-//--------------------------------------------------------------------//
+//--------------------------------------------------------------------//  
 
 void semaphore_wait(semaphore *sem)
 {
